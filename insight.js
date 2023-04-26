@@ -7,35 +7,39 @@ function insight(div, data, options) {
  this.rows = this.data;
 
  this.menu_container = document.createElement('div');
+ this.settings_container = document.createElement('div');
  this.pivot_container = document.createElement('div');
  this.table_container = document.createElement('div');
 
- // Visiblity buttons
- let visibilityPivot = document.createElement('button'); visibilityPivot.textContent = 'Pivot';
- visibilityPivot.onclick = (function (obj) { return function () { obj.options.pivot.visible = !obj.options.pivot.visible; obj.render(); } })(this)
+ // Menu container
 
- let visibilityTable = document.createElement('button'); visibilityTable.textContent = 'Table';
- visibilityTable.onclick = (function (obj) { return function () { obj.options.table.visible = !obj.options.table.visible; obj.render(); } })(this)
- 
- this.menu_container.append(visibilityPivot);
- this.menu_container.append(visibilityTable);
+  // Visiblity buttons
+  let visibilityPivot = document.createElement('button'); visibilityPivot.textContent = 'Pivot';
+  visibilityPivot.onclick = (function (obj) { return function () { obj.options.pivot.visible = !obj.options.pivot.visible; obj.render(); } })(this)
 
- // Master search
- let inputSearch = document.createElement("input");
- inputSearch.oninput = (function (obj) { return function () { obj.options.filters.master = this.value.toLowerCase(); obj.render(); } })(this)
- this.menu_container.append(inputSearch);
+  let visibilityTable = document.createElement('button'); visibilityTable.textContent = 'Table';
+  visibilityTable.onclick = (function (obj) { return function () { obj.options.table.visible = !obj.options.table.visible; obj.render(); } })(this)
+  
+  this.menu_container.append(visibilityPivot);
+  this.menu_container.append(visibilityTable);
+
+  // Master search
+  let inputSearch = document.createElement("input");
+  inputSearch.oninput = (function (obj) { return function () { obj.options.filters.master = this.value.toLowerCase(); obj.render(); } })(this)
+  this.menu_container.append(inputSearch);
 
  // Container render
  document.getElementById(div).append(
   this.menu_container,
+  this.settings_container,
   this.pivot_container,
   this.table_container
  );
 
  this.render = function() {
-  this.rows = [];
-
+  
   // Filters
+  this.rows = [];
   if (this.options.filters.master != "") { for (let i = 0; i < this.data.length; i++) { if (this.data[i].join().toLowerCase().includes(this.options.filters.master)) { this.rows.push(this.data[i]); } } }
   else { this.rows = this.data; }
 
@@ -94,30 +98,36 @@ function insight(div, data, options) {
 
   // Headers
   let tr = document.createElement("tr");
-  for (let i = 0; i < this.headers.length; i++)
-  {
+  for (let i = 0; i < this.headers.length; i++) {
    let th = document.createElement('th');
-   th.textContent = this.headers[i];
+
+   // Sorting handler
    th.onclick = (function (obj) { return function () {
     if (obj.options.table.sort.col == i) { obj.options.table.sort.order = !obj.options.table.sort.order; }
     else { obj.options.table.sort.order = true; obj.options.table.sort.col = i; }
     obj.render();
    } })(this);
+
+   // Label content
+   if (this.options.table.sort.col == i && this.options.table.sort.order) { th.textContent = this.headers[i] + ' ↑'; }
+   else if (this.options.table.sort.col == i && !this.options.table.sort.order) { th.textContent = this.headers[i] + ' ↓'; }
+   else { th.textContent = this.headers[i]; }
    tr.append(th);
   }
   thead.append(tr);
   
   // Body
-  for (let i = 0; i < this.rows.length; i++)
-  {
-   let tr = document.createElement("tr");
-   for (let i2 = 0; i2 < this.rows[i].length; i2++)
-   {
-    let td = document.createElement("td");
-    td.textContent = this.rows[i][i2];
-    tr.append(td);
+  for (let i = 0; i < this.rows.length; i++) {
+   if (i < 20) {
+    let tr = document.createElement("tr");
+    for (let i2 = 0; i2 < this.rows[i].length; i2++)
+    {
+     let td = document.createElement("td");
+     td.textContent = this.rows[i][i2];
+     tr.append(td);
+    }
+    tbody.append(tr);
    }
-   tbody.append(tr);
   }
 
   table.append(thead);
