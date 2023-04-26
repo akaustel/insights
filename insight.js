@@ -29,6 +29,7 @@ function Insight(div, data, options) {
   this.menu_container.append(inputSearch);
 
  // Container render
+ document.getElementById(div).replaceChildren();
  document.getElementById(div).append(
   this.menu_container,
   this.settings_container,
