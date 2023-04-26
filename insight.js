@@ -62,17 +62,76 @@ function Insight(div, data, options) {
   // Formulas
   let total_grand = this.rows.length;
 
-  // Nothing selected
-  if (true) {
+  // Rendering
+  if (this.options.pivot.rows.length == 0 && this.options.pivot.cols.length == 0) // Nothing selected
+  {
    let tr = document.createElement("tr");
    let total_grand_label = document.createElement("th"); total_grand_label.textContent = 'Totals';
    let total_grand_value = document.createElement("th"); total_grand_value.textContent = total_grand;
    tr.append(total_grand_label, total_grand_value);
    tfoot.append(tr);
   }
-  // Rows
-  // Cols
-  // Rows & Cols
+  else if (this.options.pivot.rows.length > 0 && this.options.pivot.cols.length == 0) // Rows
+  {
+   // Headers
+   let headers = document.createElement("tr");
+   for (let i = 0; i < this.options.pivot.rows.length; i++)
+   {
+    let header = document.createElement("th"); header.textContent = this.headers[this.options.pivot.rows[i]];
+    headers.append(header);
+   }
+   let header = document.createElement("th"); header.textContent = 'Totals';
+   headers.append(header);
+   thead.append(headers);
+
+   // Body
+   let rows = {};
+   for (let i = 0; i < this.rows.length; i++)
+   {
+    let keys = [];
+    for (let i2 = 0; i2 < this.options.pivot.rows.length; i2++) {
+     keys.push(this.rows[i][this.options.pivot.rows[i2]]);
+    }
+    key = keys.join('|');
+    if (typeof rows[key] == 'undefined') { rows[key] = [key, keys, 1]; }
+    else { rows[key][2]++; } // Count
+   }
+   rows = Object.values(rows);
+   rows.sort(function(a,b) { return a[0] < b[0] ? 1 : -1 });
+
+   for (let i = 0; i < rows.length; i++)
+   {
+    let tr = document.createElement("tr");
+    for (let i2 = 0; i2 < rows[i][1].length; i2++)
+    {
+      let key = document.createElement("th"); key.textContent = rows[i][1][i2];
+      tr.append(key);
+    }
+
+    let value = document.createElement("th"); value.textContent = rows[i][2];
+    tr.append(value);
+    tbody.append(tr);
+    // console.log(rivi);
+   }
+
+   // Footer
+   let tr = document.createElement("tr");
+   let total_grand_label = document.createElement("th"); total_grand_label.textContent = 'Totals';
+   let total_grand_value = document.createElement("th"); total_grand_value.textContent = total_grand;
+   tr.append(total_grand_label, total_grand_value);
+   tfoot.append(tr);
+  }
+  else if (this.options.pivot.rows.length == 0 && this.options.pivot.cols.length > 0) // Cols
+  {
+  }
+  else // Rows & Cols
+  {
+   let tr = document.createElement("tr");
+   let total_grand_label = document.createElement("th"); total_grand_label.textContent = 'Totals';
+   let total_grand_value = document.createElement("th"); total_grand_value.textContent = total_grand;
+   tr.append(total_grand_label, total_grand_value);
+   tfoot.append(tr);
+  }
 
   table.append(thead);
   table.append(tbody);
