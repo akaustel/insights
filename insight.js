@@ -1,4 +1,4 @@
-function insight(div, data, options) {
+function Insight(div, data, options) {
 
  this.data = data;
  this.options = options;
