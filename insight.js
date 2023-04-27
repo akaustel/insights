@@ -25,7 +25,7 @@ function Insight(div, data, options) {
 
   // Master search
   let inputSearch = document.createElement("input");
-  inputSearch.oninput = (function (obj) { return function () { obj.options.filters.master = this.value.toLowerCase(); obj.render(); } })(this)
+  inputSearch.oninput = (function (obj) { return function () { obj.options.filters.master = inputSearch.value.toLowerCase(); obj.render(); } })(this)
   this.menu_container.append(inputSearch);
 
   // Settings container
@@ -112,18 +112,18 @@ function Insight(div, data, options) {
    thead.append(headers);
 
    // Body
-   let rows = {};
+   let rowMap = {};
    for (let i = 0; i < this.rows.length; i++)
    {
     let keys = [];
     for (let i2 = 0; i2 < this.options.pivot.rows.length; i2++) {
      keys.push(this.rows[i][this.options.pivot.rows[i2]]);
     }
-    key = keys.join('|');
-    if (typeof rows[key] == 'undefined') { rows[key] = [key, keys, 1]; }
-    else { rows[key][2]++; } // Count
+    const key = keys.join('|');
+    if (typeof rowMap[key] == 'undefined') { rowMap[key] = [key, keys, 1]; }
+    else { rowMap[key][2]++; } // Count
    }
-   rows = Object.values(rows);
+   const rows = Object.values(rowMap);
 
    // Sorting
    rows.sort(function(a,b) { return a[0] < b[0] ? 1 : -1 });
@@ -152,18 +152,18 @@ function Insight(div, data, options) {
   }
   else if (this.options.pivot.rows.length == 0 && this.options.pivot.cols.length > 0) // Cols
   {
-    let cols = {};
+    let colMap = {};
     for (let i = 0; i < this.rows.length; i++)
     {
     let keys = [];
     for (let i2 = 0; i2 < this.options.pivot.cols.length; i2++) {
       keys.push(this.rows[i][this.options.pivot.cols[i2]]);
     }
-    key = keys.join('|');
-    if (typeof cols[key] == 'undefined') { cols[key] = [key, keys, 1]; }
-    else { cols[key][2]++; } // Count
+    const key = keys.join('|');
+    if (typeof colMap[key] == 'undefined') { colMap[key] = [key, keys, 1]; }
+    else { colMap[key][2]++; } // Count
     }
-    cols = Object.values(cols);
+    const cols = Object.values(colMap);
 
     // Sorting
     cols.sort(function(a,b) { return a[0] > b[0] ? 1 : -1 });
@@ -208,8 +208,8 @@ function Insight(div, data, options) {
   else // Rows & Cols
   {
     // Data
-    let cols = {};
-    let rows = {};
+    let colMap = {};
+    let rowMap = {};
     let matrix = {};
     for (let i = 0; i < this.rows.length; i++) {
       let col_keys = [];
@@ -220,12 +220,12 @@ function Insight(div, data, options) {
       let col_key = col_keys.join('|');
       let row_key = row_keys.join('|');
       let matrix_key = row_key + '|' + col_key;
-      if (typeof cols[col_key] == 'undefined') { cols[col_key] = [col_key, col_keys, 1]; } else { cols[col_key][2]++; } // Count
-      if (typeof rows[row_key] == 'undefined') { rows[row_key] = [row_key, row_keys, 1]; } else { rows[row_key][2]++; } // Count
+      if (typeof colMap[col_key] == 'undefined') { colMap[col_key] = [col_key, col_keys, 1]; } else { colMap[col_key][2]++; } // Count
+      if (typeof rowMap[row_key] == 'undefined') { rowMap[row_key] = [row_key, row_keys, 1]; } else { rowMap[row_key][2]++; } // Count
       if (typeof matrix[matrix_key] == 'undefined') { matrix[matrix_key] = 1; } else { matrix[matrix_key]++; } // Count
     }
-    cols = Object.values(cols);
-    rows = Object.values(rows);
+    const cols = Object.values(colMap);
+    const rows = Object.values(rowMap);
 
     // Sorting
     let type = 0;
